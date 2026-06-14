@@ -1,0 +1,43 @@
+camera:
+  capture_width: 1280
+  capture_height: 720
+  output_width: 640
+  output_height: 360
+  fps: 30
+  front_sensor_id: 0
+  side_sensor_id: 1
+
+bev:
+  width: 640
+  height: 640
+  # Source points are image pixels ordered: front-left, front-right, rear-right, rear-left.
+  # Tune these with tools/tune_bev.py on the actual parking board.
+  src_points:
+    - [170, 130]
+    - [470, 130]
+    - [620, 350]
+    - [20, 350]
+  dst_points:
+    - [180, 0]
+    - [460, 0]
+    - [460, 640]
+    - [180, 640]
+  meters_per_pixel: 0.0015
+
+vision:
+  tape_hsv_lower: [20, 25, 140]
+  tape_hsv_upper: [75, 220, 255]
+  min_line_length: 35
+  max_line_gap: 18
+  hough_threshold: 35
+  min_slot_area_px: 8000
+  max_slot_area_px: 180000
+
+rover:
+  serial_port: /dev/ttyUSB0
+  baud_rate: 115200
+  max_speed: 0.5
+  max_steer: 1.0
+  default_speed: 0.10
+  wheelbase_m: 0.18
+

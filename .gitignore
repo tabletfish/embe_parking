@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.git/
+.agents/
+.codex/
+.pytest_cache/
+.mypy_cache/
+logs/
+captures/
+*.mp4
+*.avi
+*.engine
+*.onnx
