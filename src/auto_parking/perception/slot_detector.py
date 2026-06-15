@@ -82,6 +82,18 @@ def _column_groups(active_columns):
     return groups
 
 
+def _longest_true_run(values):
+    longest = 0
+    current = 0
+    for value in values:
+        if value:
+            current += 1
+            longest = max(longest, current)
+        else:
+            current = 0
+    return longest
+
+
 def detect_vertical_tape_boundaries(mask, config):
     height, width = mask.shape[:2]
     vision = config["vision"]
@@ -95,6 +107,7 @@ def detect_vertical_tape_boundaries(mask, config):
 
     min_pixels = int(roi.shape[0] * float(vision.get("min_boundary_column_fill", 0.18)))
     min_height = int(roi.shape[0] * float(vision.get("min_boundary_height_ratio", 0.45)))
+    min_longest_run = int(roi.shape[0] * float(vision.get("min_boundary_longest_run_ratio", 0.45)))
     min_width = int(vision.get("min_boundary_width_px", 12))
     max_width = int(vision.get("max_boundary_width_px", 180))
     column_counts = np.count_nonzero(roi, axis=0)
@@ -112,6 +125,9 @@ def detect_vertical_tape_boundaries(mask, config):
             continue
         boundary_height = int(len(np.unique(ys)))
         if boundary_height < min_height:
+            continue
+        row_has_tape = np.count_nonzero(patch, axis=1) > 0
+        if _longest_true_run(row_has_tape) < min_longest_run:
             continue
         center_x = int(left + start_x + np.mean(xs))
         center_y = int(top + np.mean(ys))

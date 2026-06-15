@@ -13,8 +13,8 @@ class ParkingState(Enum):
 
 
 class ParkingFSM:
-    def __init__(self):
-        self.state = ParkingState.MANUAL
+    def __init__(self, initial_state=ParkingState.MANUAL):
+        self.state = initial_state
 
     def set_auto(self):
         self.state = ParkingState.SEARCH_SLOT
@@ -36,4 +36,3 @@ class ParkingFSM:
         elif self.state == ParkingState.FINAL_ALIGN:
             self.state = ParkingState.SUCCESS
         return self.state
-
