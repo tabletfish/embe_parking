@@ -37,7 +37,11 @@ vision:
   entry_offset_px: 120
   boundary_scan_top_ratio: 0.05
   boundary_scan_bottom_ratio: 0.78
+  parking_roi_left_ratio: 0.45
+  parking_roi_right_ratio: 1.0
   min_boundary_column_fill: 0.18
+  min_boundary_height_ratio: 0.45
+  min_slot_boundary_height_ratio: 0.25
   min_boundary_width_px: 12
   max_boundary_width_px: 180
 

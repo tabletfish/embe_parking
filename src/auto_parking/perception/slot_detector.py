@@ -83,15 +83,18 @@ def _column_groups(active_columns):
 
 
 def detect_vertical_tape_boundaries(mask, config):
-    height, _ = mask.shape[:2]
+    height, width = mask.shape[:2]
     vision = config["vision"]
     top = int(height * float(vision.get("boundary_scan_top_ratio", 0.05)))
     bottom = int(height * float(vision.get("boundary_scan_bottom_ratio", 0.78)))
-    roi = mask[top:bottom]
+    left = int(width * float(vision.get("parking_roi_left_ratio", 0.45)))
+    right = int(width * float(vision.get("parking_roi_right_ratio", 1.0)))
+    roi = mask[top:bottom, left:right]
     if roi.size == 0:
         return []
 
     min_pixels = int(roi.shape[0] * float(vision.get("min_boundary_column_fill", 0.18)))
+    min_height = int(roi.shape[0] * float(vision.get("min_boundary_height_ratio", 0.45)))
     min_width = int(vision.get("min_boundary_width_px", 12))
     max_width = int(vision.get("max_boundary_width_px", 180))
     column_counts = np.count_nonzero(roi, axis=0)
@@ -107,13 +110,16 @@ def detect_vertical_tape_boundaries(mask, config):
         ys, xs = np.nonzero(patch)
         if len(xs) == 0:
             continue
-        center_x = int(start_x + np.mean(xs))
+        boundary_height = int(len(np.unique(ys)))
+        if boundary_height < min_height:
+            continue
+        center_x = int(left + start_x + np.mean(xs))
         center_y = int(top + np.mean(ys))
         boundaries.append(
             TapeBoundary(
                 center_px=(center_x, center_y),
                 width_px=width,
-                height_px=int(len(np.unique(ys))),
+                height_px=boundary_height,
             )
         )
     return boundaries
@@ -137,6 +143,8 @@ def infer_parking_slots_from_mask(mask, config):
         rx, ry = right.center_px
         width = rx - lx
         if width < min_width or width > max_width:
+            continue
+        if min(left.height_px, right.height_px) < int(mask.shape[0] * float(vision.get("min_slot_boundary_height_ratio", 0.25))):
             continue
 
         cx = int((lx + rx) / 2)
