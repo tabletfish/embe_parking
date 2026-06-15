@@ -12,7 +12,12 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from auto_parking.camera.csi import open_video_source  # noqa: E402
 from auto_parking.config import load_config  # noqa: E402
 from auto_parking.perception.bev import BirdEyeView  # noqa: E402
-from auto_parking.perception.slot_detector import detect_slot_candidates, draw_slots  # noqa: E402
+from auto_parking.perception.slot_detector import (  # noqa: E402
+    detect_slot_candidates,
+    draw_parking_slots,
+    draw_slots,
+    infer_parking_slots,
+)
 from auto_parking.perception.tape import tape_mask  # noqa: E402
 
 
@@ -43,8 +48,10 @@ def main():
         top = bev.warp(frame)
         mask = tape_mask(top, config)
         slots = detect_slot_candidates(mask, config)
+        parking_slots = infer_parking_slots(slots, config)
         debug = bev.draw_grid(top)
         debug = draw_slots(debug, slots)
+        debug = draw_parking_slots(debug, parking_slots)
 
         mask_bgr = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
         if frame.shape[:2] != top.shape[:2]:
@@ -64,4 +71,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
