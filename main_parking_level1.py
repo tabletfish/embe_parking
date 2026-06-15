@@ -23,6 +23,7 @@ from auto_parking.perception.slot_detector import (  # noqa: E402
 )
 from auto_parking.perception.tape import tape_mask  # noqa: E402
 from auto_parking.planning.pure_pursuit import pure_pursuit_steering  # noqa: E402
+from auto_parking.control.drive import compute_wheel_speeds  # noqa: E402
 
 
 def parse_source(value):
@@ -82,6 +83,7 @@ def main():
         drive = RoverDrive(config)
 
     speed = float(args.speed if args.speed is not None else config["rover"]["default_speed"])
+    speed = min(speed, float(config["rover"]["max_speed"]))
     wheelbase_m = float(config["rover"]["wheelbase_m"])
     last_print = 0.0
 
@@ -109,15 +111,23 @@ def main():
                 target = entry_to_path_point(bev, selected.entry_px)
                 path = np.array([target], dtype=float)
                 steering, _ = pure_pursuit_steering(path, (0.0, 0.0, 0.0), 0.05, wheelbase_m)
+                left_cmd, right_cmd = compute_wheel_speeds(
+                    steering,
+                    speed,
+                    float(config["rover"]["max_steer"]),
+                    float(config["rover"]["max_speed"]),
+                )
                 debug = draw_control_debug(debug, selected.entry_px, target, steering, args.drive)
 
                 now = time.monotonic()
                 if now - last_print >= 0.5:
                     print(
+                        f"mode={'DRIVE' if args.drive else 'DRY-RUN'} "
                         f"entry_px={selected.entry_px} "
                         f"target_forward={target[0]:.3f}m "
                         f"target_lateral={target[1]:+.3f}m "
-                        f"steering={steering:+.3f} speed={speed:.2f}"
+                        f"steering={steering:+.3f} speed={speed:.2f} "
+                        f"L={left_cmd:+.3f} R={right_cmd:+.3f}"
                     )
                     last_print = now
 
