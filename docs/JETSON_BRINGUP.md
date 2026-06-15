@@ -76,6 +76,23 @@ python3 tools/tune_bev.py
 
 출력값을 `config.yaml`의 `bev.src_points`에 반영합니다.
 
+Jetson에서 튜닝한 값은 가능하면 `config.local.yaml`에 저장합니다. 이 파일은 Git에 올라가지 않으므로 이후 코드 업데이트 때 `git pull`과 충돌할 가능성이 낮습니다.
+
+예:
+
+```yaml
+bev:
+  src_points:
+    - [112, 88]
+    - [530, 91]
+    - [610, 348]
+    - [42, 352]
+
+vision:
+  tape_hsv_lower: [15, 10, 80]
+  tape_hsv_upper: [95, 255, 255]
+```
+
 ## 4. 테이프 HSV 튜닝
 
 ```bash
