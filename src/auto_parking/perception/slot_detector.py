@@ -234,6 +234,24 @@ def draw_parking_slots(image, parking_slots):
     return out
 
 
+def draw_locked_parking_slot(image, center_px, entry_px):
+    out = image.copy()
+    cv2.circle(out, center_px, 7, (180, 0, 255), -1)
+    cv2.circle(out, entry_px, 7, (0, 80, 255), -1)
+    cv2.line(out, center_px, entry_px, (0, 80, 255), 2)
+    cv2.putText(
+        out,
+        "LOCKED",
+        (center_px[0] + 8, center_px[1] - 8),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.55,
+        (180, 0, 255),
+        2,
+        cv2.LINE_AA,
+    )
+    return out
+
+
 def draw_tape_boundaries(image, boundaries):
     out = image.copy()
     for idx, boundary in enumerate(boundaries):

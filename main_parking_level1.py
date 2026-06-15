@@ -16,6 +16,7 @@ from auto_parking.perception.bev import BirdEyeView  # noqa: E402
 from auto_parking.perception.slot_detector import (  # noqa: E402
     detect_slot_candidates,
     detect_vertical_tape_boundaries,
+    draw_locked_parking_slot,
     draw_parking_slots,
     draw_slots,
     draw_tape_boundaries,
@@ -94,6 +95,7 @@ def main():
     last_loop = time.monotonic()
     locked_target = None
     locked_entry_px = None
+    locked_center_px = None
 
     try:
         while True:
@@ -126,12 +128,15 @@ def main():
                 entry_px = selected.entry_px
                 locked_target = target
                 locked_entry_px = entry_px
+                locked_center_px = selected.center_px
                 target_locked = False
 
-            if locked_target is not None and not parking_slots and drive is not None:
+            if locked_target is not None and not parking_slots:
                 remaining_forward = max(0.0, locked_target[0] - speed * dt)
                 locked_target = (remaining_forward, locked_target[1])
                 target = locked_target
+                if locked_center_px is not None and locked_entry_px is not None:
+                    debug = draw_locked_parking_slot(debug, locked_center_px, locked_entry_px)
 
             if target is not None:
                 at_entry = target[0] <= args.entry_threshold

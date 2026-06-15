@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import sys
+import time
 from pathlib import Path
 
 import cv2
@@ -14,6 +15,7 @@ from auto_parking.config import load_config  # noqa: E402
 from auto_parking.perception.bev import BirdEyeView  # noqa: E402
 from auto_parking.perception.slot_detector import (  # noqa: E402
     detect_vertical_tape_boundaries,
+    draw_locked_parking_slot,
     detect_slot_candidates,
     draw_parking_slots,
     draw_slots,
@@ -41,6 +43,9 @@ def main():
     config = load_config(args.config)
     cap = open_video_source(parse_source(args.source), config)
     bev = BirdEyeView(config)
+    locked_slot = None
+    locked_at = 0.0
+    lock_timeout_s = 3.0
 
     while True:
         ok, frame = cap.read()
@@ -52,10 +57,19 @@ def main():
         slots = detect_slot_candidates(mask, config)
         boundaries = detect_vertical_tape_boundaries(mask, config)
         parking_slots = infer_parking_slots_from_mask(mask, config)
+        now = time.monotonic()
+        if parking_slots:
+            locked_slot = parking_slots[0]
+            locked_at = now
+        elif locked_slot is not None and now - locked_at > lock_timeout_s:
+            locked_slot = None
+
         debug = bev.draw_grid(top)
         debug = draw_slots(debug, slots)
         debug = draw_tape_boundaries(debug, boundaries)
         debug = draw_parking_slots(debug, parking_slots)
+        if not parking_slots and locked_slot is not None:
+            debug = draw_locked_parking_slot(debug, locked_slot.center_px, locked_slot.entry_px)
 
         mask_bgr = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
         if frame.shape[:2] != top.shape[:2]:
