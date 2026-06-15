@@ -6,6 +6,8 @@ Jetson Orin Nano 기반 dual-camera rover로 자동주차를 구현하는 프로
 
 ## 현재 목표
 
+과제 전체 요구사항은 `docs/PROJECT_REQUIREMENTS.md`에 정리합니다. 최종 목표는 Level 1, Level 2, Level 3 전체 수행입니다.
+
 우선 Level 1을 완성합니다.
 
 ```text
