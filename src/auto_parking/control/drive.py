@@ -6,8 +6,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 ROVER_DIR = PROJECT_ROOT / "rover"
 sys.path.insert(0, str(ROVER_DIR))
 
-from base_ctrl import BaseController  # noqa: E402
-
 
 def clip(value, limit):
     return max(-limit, min(limit, value))
@@ -33,6 +31,8 @@ def compute_wheel_speeds(steering, speed, max_steer=1.0, max_speed=0.5):
 
 class RoverDrive:
     def __init__(self, config):
+        from base_ctrl import BaseController  # noqa: WPS433
+
         rover = config["rover"]
         self.max_speed = float(rover["max_speed"])
         self.max_steer = float(rover["max_steer"])
@@ -45,4 +45,3 @@ class RoverDrive:
 
     def stop(self):
         self.base.base_json_ctrl({"T": 1, "L": 0.0, "R": 0.0})
-

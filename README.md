@@ -178,6 +178,45 @@ q: 종료
 
 만약 전진/후진 또는 좌우가 반대로 움직이면 `src/auto_parking/control/drive.py`의 `compute_wheel_speeds()`에서 부호 또는 L/R 순서를 조정해야 합니다.
 
+### 5-1. 모범 주차 수동 기록/재생
+
+자동 인식 없이, 사람이 수동으로 성공한 주차 조작을 기록했다가 같은 명령을 그대로 재생할 수 있습니다.
+
+녹화:
+
+```bash
+python3 record_manual_parking.py -o recordings/parking_demo.json
+```
+
+조작:
+
+```text
+w: 가속
+s: 후진 가속
+a: 좌회전
+d: 우회전
+space: 정지
+q: 녹화 종료 후 저장
+```
+
+재생 전에는 로버를 녹화 시작 위치와 같은 위치/방향에 놓아야 합니다.
+
+```bash
+python3 replay_manual_parking.py recordings/parking_demo.json
+```
+
+안전하게 절반 속도로 재생하려면:
+
+```bash
+python3 replay_manual_parking.py recordings/parking_demo.json --speed-scale 0.5
+```
+
+모터 연결 없이 파일 형식과 타이밍만 확인하려면:
+
+```bash
+python3 replay_manual_parking.py recordings/parking_demo.json --dry-run
+```
+
 ### 6. Level 1 주차 로직 붙이기
 
 BEV와 수동조작이 안정화되면 다음 순서로 구현합니다.
