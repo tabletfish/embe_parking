@@ -55,6 +55,8 @@ src/auto_parking/state_machine/
 
 ## 해야 할 과정
 
+Jetson에서 처음 가져가서 실행하는 순서는 `docs/JETSON_BRINGUP.md`를 먼저 따릅니다. 아직 Jetson 쪽 변경분을 push하지 않았다면 기존 작업본을 백업하거나 `jetson-baseline` 브랜치로 먼저 저장한 뒤 진행합니다.
+
 ### 1. 카메라가 열리는지 확인
 
 ```bash

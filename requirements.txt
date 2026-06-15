@@ -1,0 +1,6 @@
+numpy
+opencv-python
+pyserial
+pynput
+PyYAML
+traitlets
