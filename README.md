@@ -62,6 +62,18 @@ src/auto_parking/state_machine/
 
 Jetson에서 처음 가져가서 실행하는 순서는 `docs/JETSON_BRINGUP.md`를 먼저 따릅니다. 아직 Jetson 쪽 변경분을 push하지 않았다면 기존 작업본을 백업하거나 `jetson-baseline` 브랜치로 먼저 저장한 뒤 진행합니다.
 
+Jetson에서 `config.yaml`을 직접 수정하면 `git pull` 때 충돌이 날 수 있습니다. 한 번만 아래 명령을 실행해서 Jetson 전용 설정을 `config.local.yaml`로 분리합니다.
+
+```bash
+bash tools/jetson_config_local.sh
+```
+
+그 뒤부터는 `config.local.yaml`만 수정하고, 업데이트는 평소처럼 실행합니다.
+
+```bash
+git pull
+```
+
 ### 1. 카메라가 열리는지 확인
 
 ```bash
