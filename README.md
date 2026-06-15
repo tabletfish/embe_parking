@@ -206,16 +206,16 @@ q: 종료
 python3 record.py -o recordings/parking_demo.json
 ```
 
-녹화 중에는 기본으로 `front | BEV slots | tape mask` 카메라 창이 같이 뜹니다. USB 카메라를 쓰면:
+녹화 중 카메라 창도 같이 보고 싶으면:
 
 ```bash
-python3 record.py 0 -o recordings/parking_demo.json
+python3 record.py --camera -o recordings/parking_demo.json
 ```
 
-카메라 창 없이 명령만 녹화하려면:
+USB 카메라를 쓰면:
 
 ```bash
-python3 record.py -o recordings/parking_demo.json --no-camera
+python3 record.py 0 --camera -o recordings/parking_demo.json
 ```
 
 기본 녹화 입력은 참고 코드와 같은 입력값을 사용합니다. 더 천천히 가거나 더 크게 꺾고 싶으면:
@@ -239,6 +239,18 @@ q: 녹화 종료 후 저장
 
 ```bash
 python3 replay.py recordings/parking_demo.json
+```
+
+재생 중에는 기본으로 `front | BEV slots | tape mask` 카메라 창이 같이 뜹니다. USB 카메라를 쓰면:
+
+```bash
+python3 replay.py recordings/parking_demo.json --source 0
+```
+
+카메라 창 없이 재생하려면:
+
+```bash
+python3 replay.py recordings/parking_demo.json --no-camera
 ```
 
 안전하게 절반 속도로 재생하려면:

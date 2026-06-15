@@ -26,6 +26,10 @@ def parse_args():
         help="recording JSON path",
     )
     parser.add_argument(
+        "--source",
+        help="camera index, video path, or omitted for CSI cam0",
+    )
+    parser.add_argument(
         "--config",
         default=None,
         help="config YAML path; defaults to config.yaml plus config.local.yaml",
@@ -52,6 +56,11 @@ def parse_args():
         type=float,
         default=3.0,
         help="seconds to wait before replay starts",
+    )
+    parser.add_argument(
+        "--no-camera",
+        action="store_true",
+        help="replay without opening the BEV camera window",
     )
     return parser.parse_args()
 
@@ -81,7 +90,8 @@ def main():
     args = parse_args()
     config = load_config(args.config)
     data, samples = load_recording(args.recording)
-    drive = None if args.dry_run else RoverDrive(config)
+    drive = None
+    bev_view = None
 
     max_speed = float(config["rover"]["max_speed"])
     max_steer = float(config["rover"]["max_steer"])
@@ -92,12 +102,22 @@ def main():
     )
     if args.dry_run:
         print("DRY-RUN: serial port is not opened.")
+    if args.no_camera:
+        print("Camera view disabled.")
+    else:
+        print("Camera view enabled: front | BEV slots | tape mask.")
     wait_countdown(args.countdown)
 
     start_time = time.monotonic()
     last_t = 0.0
 
     try:
+        if not args.no_camera:
+            from auto_parking.debug.bev_view import BevDebugView
+
+            bev_view = BevDebugView(config, args.source, "replay | front | BEV slots | tape mask")
+        drive = None if args.dry_run else RoverDrive(config)
+
         for sample in samples:
             target_t = float(sample.get("t", last_t))
             wait_until = start_time + target_t
@@ -118,12 +138,21 @@ def main():
                 f"t={target_t:6.2f}s speed={speed:+.2f} steering={steering:+.2f} "
                 f"L={left:+.2f} R={right:+.2f}",
             )
+            if bev_view is not None:
+                keep_running = bev_view.update(
+                    f"REPLAY t={target_t:5.1f}s speed={speed:+.2f} steer={steering:+.2f} "
+                    f"L={left:+.2f} R={right:+.2f}",
+                )
+                if not keep_running:
+                    break
             last_t = target_t
     except KeyboardInterrupt:
         print("Replay interrupted.")
     finally:
         if drive is not None:
             drive.stop()
+        if bev_view is not None:
+            bev_view.close()
 
     print("Replay finished. Rover stopped.")
 
