@@ -206,6 +206,18 @@ q: 종료
 python3 record.py -o recordings/parking_demo.json
 ```
 
+녹화 중에는 기본으로 `front | BEV slots | tape mask` 카메라 창이 같이 뜹니다. USB 카메라를 쓰면:
+
+```bash
+python3 record.py 0 -o recordings/parking_demo.json
+```
+
+카메라 창 없이 명령만 녹화하려면:
+
+```bash
+python3 record.py -o recordings/parking_demo.json --no-camera
+```
+
 기본 녹화 입력은 참고 코드와 같은 입력값을 사용합니다. 더 천천히 가거나 더 크게 꺾고 싶으면:
 
 ```bash
