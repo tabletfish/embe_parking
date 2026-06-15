@@ -203,25 +203,25 @@ q: 종료
 녹화:
 
 ```bash
-python3 record.py -o recordings/parking_demo.json
+python3 record.py -o task/level1.json
 ```
 
 녹화 중 카메라 창도 같이 보고 싶으면:
 
 ```bash
-python3 record.py --camera -o recordings/parking_demo.json
+python3 record.py --camera -o task/level1.json
 ```
 
 USB 카메라를 쓰면:
 
 ```bash
-python3 record.py 0 --camera -o recordings/parking_demo.json
+python3 record.py 0 --camera -o task/level1.json
 ```
 
 기본 녹화 입력은 참고 코드와 같은 입력값을 사용합니다. 더 천천히 가거나 더 크게 꺾고 싶으면:
 
 ```bash
-python3 record.py -o recordings/parking_demo.json --max-command-speed 0.12 --step-speed 0.01 --step-steer 0.60
+python3 record.py -o task/level1.json --max-command-speed 0.12 --step-speed 0.01 --step-steer 0.60
 ```
 
 조작:
@@ -238,31 +238,31 @@ q: 녹화 종료 후 저장
 재생 전에는 로버를 녹화 시작 위치와 같은 위치/방향에 놓아야 합니다.
 
 ```bash
-python3 replay.py recordings/parking_demo.json
+python3 main.py task/level1.json
 ```
 
 재생 중에는 기본으로 `front | BEV slots | tape mask` 카메라 창이 같이 뜹니다. USB 카메라를 쓰면:
 
 ```bash
-python3 replay.py recordings/parking_demo.json --source 0
+python3 main.py task/level1.json --source 0
 ```
 
 카메라 창 없이 재생하려면:
 
 ```bash
-python3 replay.py recordings/parking_demo.json --no-camera
+python3 main.py task/level1.json --no-camera
 ```
 
 안전하게 절반 속도로 재생하려면:
 
 ```bash
-python3 replay.py recordings/parking_demo.json --speed-scale 0.5
+python3 main.py task/level1.json --speed-scale 0.5
 ```
 
 모터 연결 없이 파일 형식과 타이밍만 확인하려면:
 
 ```bash
-python3 replay.py recordings/parking_demo.json --dry-run
+python3 main.py task/level1.json --dry-run
 ```
 
 ### 6. Level 1 주차 로직 붙이기

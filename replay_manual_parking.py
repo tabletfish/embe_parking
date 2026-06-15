@@ -12,7 +12,7 @@ from auto_parking.config import load_config  # noqa: E402
 from auto_parking.control.drive import RoverDrive, clip, compute_wheel_speeds  # noqa: E402
 
 
-DEFAULT_INPUT = PROJECT_ROOT / "recordings" / "parking_demo.json"
+DEFAULT_INPUT = PROJECT_ROOT / "task" / "level1.json"
 
 
 def parse_args():

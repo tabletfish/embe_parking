@@ -7,6 +7,8 @@ __pycache__/
 .mypy_cache/
 logs/
 captures/
+recordings/
+task/
 config.local.yaml
 *.mp4
 *.avi

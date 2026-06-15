@@ -18,7 +18,7 @@ UPDATE_INTERVAL = 0.1
 DEFAULT_COMMAND_MAX_SPEED = 0.5
 SPEED_DECAY = 0.85
 STEER_DECAY = 0.60
-DEFAULT_OUTPUT = PROJECT_ROOT / "recordings" / "parking_demo.json"
+DEFAULT_OUTPUT = PROJECT_ROOT / "task" / "parking_demo.json"
 
 
 def parse_args():
