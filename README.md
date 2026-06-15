@@ -25,6 +25,9 @@ YOLO는 아직 필요하지 않습니다. Level 2에서 슬롯 내부 박스/미
 main_debug_bev.py
   카메라 영상, BEV 변환, 테이프 마스크, 슬롯 후보를 한 화면에서 확인하는 디버그 실행 파일
 
+main_parking_level1.py
+  Level 1 자동주차 루프입니다. 기본값은 dry-run이라 모터를 움직이지 않고 entry point와 steering만 표시합니다.
+
 manual_drive.py
   키보드로 rover를 직접 조작하는 파일
 
@@ -198,6 +201,24 @@ SUCCESS
 ```
 
 이미 기본 상태머신은 `src/auto_parking/state_machine/parking_fsm.py`에 있습니다. 다음 작업은 `main_parking_level1.py`를 새로 만들어 위 상태들을 실제 카메라/제어 루프와 연결하는 것입니다.
+
+먼저 dry-run으로 실행합니다.
+
+```bash
+python3 main_parking_level1.py
+```
+
+USB 카메라일 때:
+
+```bash
+python3 main_parking_level1.py 0
+```
+
+화면에 `DRY-RUN`, `park 0`, `entry`, `steer=...`가 정상적으로 보이면 낮은 속도로 실제 송신을 켭니다.
+
+```bash
+python3 main_parking_level1.py --drive --speed 0.06
+```
 
 ## 추천 개발 순서
 
