@@ -185,7 +185,7 @@ q: 종료
 녹화:
 
 ```bash
-python3 record_manual_parking.py -o recordings/parking_demo.json
+python3 record.py -o recordings/parking_demo.json
 ```
 
 조작:
@@ -202,19 +202,19 @@ q: 녹화 종료 후 저장
 재생 전에는 로버를 녹화 시작 위치와 같은 위치/방향에 놓아야 합니다.
 
 ```bash
-python3 replay_manual_parking.py recordings/parking_demo.json
+python3 replay.py recordings/parking_demo.json
 ```
 
 안전하게 절반 속도로 재생하려면:
 
 ```bash
-python3 replay_manual_parking.py recordings/parking_demo.json --speed-scale 0.5
+python3 replay.py recordings/parking_demo.json --speed-scale 0.5
 ```
 
 모터 연결 없이 파일 형식과 타이밍만 확인하려면:
 
 ```bash
-python3 replay_manual_parking.py recordings/parking_demo.json --dry-run
+python3 replay.py recordings/parking_demo.json --dry-run
 ```
 
 ### 6. Level 1 주차 로직 붙이기
