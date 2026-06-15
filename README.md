@@ -229,6 +229,8 @@ python3 record.py -o task/level1.json --max-command-speed 0.12 --step-speed 0.01
 ```text
 w: 가속
 s: 후진 가속
+i: 저속 전진
+k: 저속 후진
 a: 좌회전
 d: 우회전
 space: 정지

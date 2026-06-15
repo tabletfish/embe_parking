@@ -4,6 +4,7 @@ Manual rover drive.
 
 Controls:
   w/s       : forward / reverse
+  i/k       : slow forward / slow reverse
   a/d       : left / right steering
   Space     : stop immediately
   q / ESC   : quit
@@ -28,8 +29,9 @@ BAUD_RATE = 115200
 MAX_SPEED = 0.5
 MAX_STEER = 1.0
 SPEED_STEP = 0.05
+SLOW_SPEED_STEP = 0.02
 STEER_STEP = 0.15
-SPEED_DECAY = 0.85
+SPEED_DECAY = 0.50
 STEER_DECAY = 0.60
 
 CSI_PIPELINE = (
@@ -145,6 +147,10 @@ def main(source=None):
                 speed = _clip(speed + SPEED_STEP, MAX_SPEED)
             elif "s" in pressed:
                 speed = _clip(speed - SPEED_STEP, MAX_SPEED)
+            elif "i" in pressed:
+                speed = _clip(speed + SLOW_SPEED_STEP, MAX_SPEED)
+            elif "k" in pressed:
+                speed = _clip(speed - SLOW_SPEED_STEP, MAX_SPEED)
             else:
                 speed *= SPEED_DECAY
 

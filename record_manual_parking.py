@@ -4,6 +4,7 @@ Record manual rover commands for later replay.
 
 Controls:
   w/s       : forward / reverse
+  i/k       : slow forward / slow reverse
   a/d       : left / right steering
   Space     : stop immediately
   q / ESC   : save and quit
@@ -29,9 +30,10 @@ BAUD_RATE = 115200
 MAX_SPEED = 0.5
 MAX_STEER = 1.0
 SPEED_STEP = 0.05
+SLOW_SPEED_STEP = 0.02
 STEER_STEP = 0.15
-SPEED_DECAY = 0.0
-STEER_DECAY = 0.0
+SPEED_DECAY = 0.50
+STEER_DECAY = 0.60
 DEFAULT_OUTPUT = PROJECT_ROOT / "task" / "parking_demo.json"
 
 CSI_PIPELINE = (
@@ -159,7 +161,7 @@ def main():
         cv2.namedWindow("Record", cv2.WINDOW_NORMAL)
 
     print("[RECORD] started")
-    print("[RECORD] controls: w/s speed, a/d steering, space stop, q/ESC save and quit")
+    print("[RECORD] controls: w/s speed, i/k slow speed, a/d steering, space stop, q/ESC save and quit")
 
     try:
         while running:
@@ -174,6 +176,10 @@ def main():
                 speed = _clip(speed + SPEED_STEP, MAX_SPEED)
             elif "s" in pressed:
                 speed = _clip(speed - SPEED_STEP, MAX_SPEED)
+            elif "i" in pressed:
+                speed = _clip(speed + SLOW_SPEED_STEP, MAX_SPEED)
+            elif "k" in pressed:
+                speed = _clip(speed - SLOW_SPEED_STEP, MAX_SPEED)
             else:
                 speed *= SPEED_DECAY
 
@@ -228,6 +234,7 @@ def main():
         "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "interval": 0.1,
         "step_speed": SPEED_STEP,
+        "slow_step_speed": SLOW_SPEED_STEP,
         "step_steer": STEER_STEP,
         "max_speed": MAX_SPEED,
         "max_steer": MAX_STEER,
