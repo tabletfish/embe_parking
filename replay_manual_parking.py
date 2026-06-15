@@ -109,7 +109,8 @@ def main():
 
             steering = clip(float(sample["steering"]) * args.steer_scale, max_steer)
             speed = clip(float(sample["speed"]) * args.speed_scale, max_speed)
-            left, right = compute_wheel_speeds(steering, speed, max_steer, max_speed)
+            turn_gain = float(config["rover"].get("turn_gain", 1.35))
+            left, right = compute_wheel_speeds(steering, speed, max_steer, max_speed, turn_gain)
             if drive is not None:
                 left, right = drive.send(steering, speed)
 

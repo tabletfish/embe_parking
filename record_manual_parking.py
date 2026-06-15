@@ -12,9 +12,10 @@ from auto_parking.config import load_config  # noqa: E402
 from auto_parking.control.drive import RoverDrive, clip, compute_wheel_speeds  # noqa: E402
 
 
-STEP_STEER = 0.25
-STEP_SPEED = 0.03
+STEP_STEER = 0.45
+STEP_SPEED = 0.015
 UPDATE_INTERVAL = 0.1
+DEFAULT_COMMAND_MAX_SPEED = 0.18
 DEFAULT_OUTPUT = PROJECT_ROOT / "recordings" / "parking_demo.json"
 
 
@@ -52,6 +53,12 @@ def parse_args():
         help="steering change per update while a/d is pressed",
     )
     parser.add_argument(
+        "--max-command-speed",
+        type=float,
+        default=DEFAULT_COMMAND_MAX_SPEED,
+        help="recording speed limit",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="record commands without opening the rover serial port",
@@ -79,6 +86,7 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     drive = None if args.dry_run else RoverDrive(config)
+    max_command_speed = min(float(args.max_command_speed), float(config["rover"]["max_speed"]))
     pressed = set()
     steering = 0.0
     speed = 0.0
@@ -87,7 +95,10 @@ def main():
 
     print("Manual parking record started.")
     print("Controls: w/s speed, a/d steering, space stop, q finish and save.")
-    print(f"Input steps: speed={args.step_speed:.3f}, steering={args.step_steer:.3f}")
+    print(
+        f"Input steps: speed={args.step_speed:.3f}, steering={args.step_steer:.3f}, "
+        f"max_command_speed={max_command_speed:.3f}",
+    )
     if args.dry_run:
         print("DRY-RUN: serial port is not opened.")
 
@@ -131,9 +142,10 @@ def main():
 
             max_speed = float(config["rover"]["max_speed"])
             max_steer = float(config["rover"]["max_steer"])
-            speed = clip(speed, max_speed)
+            speed = clip(speed, max_command_speed)
             steering = clip(steering, max_steer)
-            left, right = compute_wheel_speeds(steering, speed, max_steer, max_speed)
+            turn_gain = float(config["rover"].get("turn_gain", 1.35))
+            left, right = compute_wheel_speeds(steering, speed, max_steer, max_speed, turn_gain)
             if drive is not None:
                 left, right = drive.send(steering, speed)
 
@@ -166,6 +178,7 @@ def main():
         "interval": args.interval,
         "step_speed": args.step_speed,
         "step_steer": args.step_steer,
+        "max_command_speed": max_command_speed,
         "duration": round(samples[-1]["t"], 4) if samples else 0.0,
         "rover": {
             "max_speed": float(config["rover"]["max_speed"]),
