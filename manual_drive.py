@@ -11,10 +11,12 @@ from auto_parking.config import load_config  # noqa: E402
 from auto_parking.control.drive import RoverDrive, clip  # noqa: E402
 
 
-STEP_STEER = 0.45
-STEP_SPEED = 0.015
+STEP_STEER = 0.15
+STEP_SPEED = 0.05
 UPDATE_INTERVAL = 0.1
-DEFAULT_COMMAND_MAX_SPEED = 0.18
+DEFAULT_COMMAND_MAX_SPEED = 0.5
+SPEED_DECAY = 0.85
+STEER_DECAY = 0.60
 
 
 def parse_args():
@@ -89,14 +91,14 @@ def main():
             elif "s" in pressed:
                 speed -= args.step_speed
             else:
-                speed *= 0.88
+                speed *= SPEED_DECAY
 
             if "a" in pressed:
                 steering -= args.step_steer
             elif "d" in pressed:
                 steering += args.step_steer
             else:
-                steering *= 0.55
+                steering *= STEER_DECAY
 
             if "space" in pressed:
                 speed = 0.0

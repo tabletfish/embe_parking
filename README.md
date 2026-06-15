@@ -177,7 +177,7 @@ vision:
 python3 manual_drive.py
 ```
 
-기본 수동조작은 주차 테스트용으로 속도를 낮추고 조향 반응을 크게 설정했습니다. 더 느리거나 더 크게 꺾고 싶으면:
+기본 수동조작은 참고 코드와 같은 입력값을 사용합니다. 더 느리거나 더 크게 꺾고 싶으면:
 
 ```bash
 python3 manual_drive.py --max-command-speed 0.12 --step-steer 0.60
@@ -206,7 +206,7 @@ q: 종료
 python3 record.py -o recordings/parking_demo.json
 ```
 
-기본 녹화 입력은 기존보다 느린 속도 증가량과 큰 조향 증가량을 사용합니다. 더 천천히 가거나 더 크게 꺾고 싶으면:
+기본 녹화 입력은 참고 코드와 같은 입력값을 사용합니다. 더 천천히 가거나 더 크게 꺾고 싶으면:
 
 ```bash
 python3 record.py -o recordings/parking_demo.json --max-command-speed 0.12 --step-speed 0.01 --step-steer 0.60

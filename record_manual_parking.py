@@ -12,10 +12,12 @@ from auto_parking.config import load_config  # noqa: E402
 from auto_parking.control.drive import RoverDrive, clip, compute_wheel_speeds  # noqa: E402
 
 
-STEP_STEER = 0.45
-STEP_SPEED = 0.015
+STEP_STEER = 0.15
+STEP_SPEED = 0.05
 UPDATE_INTERVAL = 0.1
-DEFAULT_COMMAND_MAX_SPEED = 0.18
+DEFAULT_COMMAND_MAX_SPEED = 0.5
+SPEED_DECAY = 0.85
+STEER_DECAY = 0.60
 DEFAULT_OUTPUT = PROJECT_ROOT / "recordings" / "parking_demo.json"
 
 
@@ -127,14 +129,14 @@ def main():
             elif "s" in pressed:
                 speed -= args.step_speed
             else:
-                speed *= 0.88
+                speed *= SPEED_DECAY
 
             if "a" in pressed:
                 steering -= args.step_steer
             elif "d" in pressed:
                 steering += args.step_steer
             else:
-                steering *= 0.55
+                steering *= STEER_DECAY
 
             if "space" in pressed:
                 speed = 0.0
@@ -144,7 +146,7 @@ def main():
             max_steer = float(config["rover"]["max_steer"])
             speed = clip(speed, max_command_speed)
             steering = clip(steering, max_steer)
-            turn_gain = float(config["rover"].get("turn_gain", 1.35))
+            turn_gain = float(config["rover"].get("turn_gain", 0.9))
             left, right = compute_wheel_speeds(steering, speed, max_steer, max_speed, turn_gain)
             if drive is not None:
                 left, right = drive.send(steering, speed)

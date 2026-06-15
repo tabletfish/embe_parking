@@ -11,7 +11,7 @@ def clip(value, limit):
     return max(-limit, min(limit, value))
 
 
-def compute_wheel_speeds(steering, speed, max_steer=1.0, max_speed=0.5, turn_gain=1.35):
+def compute_wheel_speeds(steering, speed, max_steer=1.0, max_speed=0.5, turn_gain=0.9):
     steer = clip(steering, max_steer)
     spd = clip(speed, max_speed)
     base = abs(spd)
@@ -36,7 +36,7 @@ class RoverDrive:
         rover = config["rover"]
         self.max_speed = float(rover["max_speed"])
         self.max_steer = float(rover["max_steer"])
-        self.turn_gain = float(rover.get("turn_gain", 1.35))
+        self.turn_gain = float(rover.get("turn_gain", 0.9))
         self.base = BaseController(rover["serial_port"], int(rover["baud_rate"]))
 
     def send(self, steering, speed):
