@@ -188,6 +188,12 @@ q: 종료
 python3 record.py -o recordings/parking_demo.json
 ```
 
+기본 녹화 입력은 기존보다 느린 속도 증가량과 큰 조향 증가량을 사용합니다. 더 천천히 가거나 더 크게 꺾고 싶으면:
+
+```bash
+python3 record.py -o recordings/parking_demo.json --step-speed 0.02 --step-steer 0.35
+```
+
 조작:
 
 ```text

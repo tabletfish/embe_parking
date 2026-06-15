@@ -12,8 +12,8 @@ from auto_parking.config import load_config  # noqa: E402
 from auto_parking.control.drive import RoverDrive, clip, compute_wheel_speeds  # noqa: E402
 
 
-STEP_STEER = 0.15
-STEP_SPEED = 0.05
+STEP_STEER = 0.25
+STEP_SPEED = 0.03
 UPDATE_INTERVAL = 0.1
 DEFAULT_OUTPUT = PROJECT_ROOT / "recordings" / "parking_demo.json"
 
@@ -38,6 +38,18 @@ def parse_args():
         type=float,
         default=UPDATE_INTERVAL,
         help="record/send interval in seconds",
+    )
+    parser.add_argument(
+        "--step-speed",
+        type=float,
+        default=STEP_SPEED,
+        help="speed change per update while w/s is pressed",
+    )
+    parser.add_argument(
+        "--step-steer",
+        type=float,
+        default=STEP_STEER,
+        help="steering change per update while a/d is pressed",
     )
     parser.add_argument(
         "--dry-run",
@@ -75,6 +87,7 @@ def main():
 
     print("Manual parking record started.")
     print("Controls: w/s speed, a/d steering, space stop, q finish and save.")
+    print(f"Input steps: speed={args.step_speed:.3f}, steering={args.step_steer:.3f}")
     if args.dry_run:
         print("DRY-RUN: serial port is not opened.")
 
@@ -99,16 +112,16 @@ def main():
             loop_start = time.monotonic()
 
             if "w" in pressed:
-                speed += STEP_SPEED
+                speed += args.step_speed
             elif "s" in pressed:
-                speed -= STEP_SPEED
+                speed -= args.step_speed
             else:
                 speed *= 0.88
 
             if "a" in pressed:
-                steering -= STEP_STEER
+                steering -= args.step_steer
             elif "d" in pressed:
-                steering += STEP_STEER
+                steering += args.step_steer
             else:
                 steering *= 0.55
 
@@ -151,6 +164,8 @@ def main():
         "version": 1,
         "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "interval": args.interval,
+        "step_speed": args.step_speed,
+        "step_steer": args.step_steer,
         "duration": round(samples[-1]["t"], 4) if samples else 0.0,
         "rover": {
             "max_speed": float(config["rover"]["max_speed"]),
