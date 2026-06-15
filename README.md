@@ -219,7 +219,7 @@ python3 main_parking_level1.py 0
 화면에 `DRY-RUN`, `park 0`, `entry`, `steer=...`가 정상적으로 보이면 낮은 속도로 실제 송신을 켭니다.
 
 ```bash
-python3 main_parking_level1.py --drive --speed 0.12
+python3 main_parking_level1.py --drive --speed 0.18
 ```
 
 ## 추천 개발 순서

@@ -40,9 +40,13 @@ def entry_to_path_point(bev, entry_px):
     return forward_m, lateral_m
 
 
-def draw_control_debug(image, entry_px, target, steering, drive_enabled):
+def draw_control_debug(image, entry_px, target, steering, drive_enabled, locked=False, reached=False):
     out = image.copy()
     status = "DRIVE" if drive_enabled else "DRY-RUN"
+    if reached:
+        status = "AT_ENTRY"
+    elif locked:
+        status += " LOCKED"
     cv2.putText(
         out,
         f"{status} steer={steering:+.2f} target=({target[0]:.2f}m,{target[1]:+.2f}m)",
@@ -70,6 +74,7 @@ def main():
     parser.add_argument("--config", default=str(PROJECT_ROOT / "config.yaml"))
     parser.add_argument("--drive", action="store_true", help="send low-speed commands to the rover")
     parser.add_argument("--speed", type=float, default=None, help="override rover.default_speed")
+    parser.add_argument("--entry-threshold", type=float, default=0.08, help="stop when entry is this close in meters")
     args = parser.parse_args()
 
     config = load_config(None if args.config == str(PROJECT_ROOT / "config.yaml") else args.config)
@@ -86,9 +91,16 @@ def main():
     speed = min(speed, float(config["rover"]["max_speed"]))
     wheelbase_m = float(config["rover"]["wheelbase_m"])
     last_print = 0.0
+    last_loop = time.monotonic()
+    locked_target = None
+    locked_entry_px = None
 
     try:
         while True:
+            now = time.monotonic()
+            dt = now - last_loop
+            last_loop = now
+
             ok, frame = cap.read()
             if not ok:
                 break
@@ -105,34 +117,58 @@ def main():
             debug = draw_parking_slots(debug, parking_slots)
 
             steering = 0.0
-            target = None
+            target = locked_target
+            entry_px = locked_entry_px
+            target_locked = target is not None
             if parking_slots:
                 selected = parking_slots[0]
                 target = entry_to_path_point(bev, selected.entry_px)
+                entry_px = selected.entry_px
+                locked_target = target
+                locked_entry_px = entry_px
+                target_locked = False
+
+            if locked_target is not None and not parking_slots and drive is not None:
+                remaining_forward = max(0.0, locked_target[0] - speed * dt)
+                locked_target = (remaining_forward, locked_target[1])
+                target = locked_target
+
+            if target is not None:
+                at_entry = target[0] <= args.entry_threshold
                 path = np.array([target], dtype=float)
-                steering, _ = pure_pursuit_steering(path, (0.0, 0.0, 0.0), 0.05, wheelbase_m)
+                if at_entry:
+                    steering = 0.0
+                    command_speed = 0.0
+                else:
+                    steering, _ = pure_pursuit_steering(path, (0.0, 0.0, 0.0), 0.05, wheelbase_m)
+                    command_speed = speed
                 left_cmd, right_cmd = compute_wheel_speeds(
                     steering,
-                    speed,
+                    command_speed,
                     float(config["rover"]["max_steer"]),
                     float(config["rover"]["max_speed"]),
                 )
-                debug = draw_control_debug(debug, selected.entry_px, target, steering, args.drive)
+                if entry_px is not None:
+                    debug = draw_control_debug(debug, entry_px, target, steering, args.drive, target_locked, at_entry)
 
-                now = time.monotonic()
                 if now - last_print >= 0.5:
                     print(
                         f"mode={'DRIVE' if args.drive else 'DRY-RUN'} "
-                        f"entry_px={selected.entry_px} "
+                        f"{'LOCKED ' if target_locked else ''}"
+                        f"{'AT_ENTRY ' if at_entry else ''}"
+                        f"entry_px={entry_px} "
                         f"target_forward={target[0]:.3f}m "
                         f"target_lateral={target[1]:+.3f}m "
-                        f"steering={steering:+.3f} speed={speed:.2f} "
+                        f"steering={steering:+.3f} speed={command_speed:.2f} "
                         f"L={left_cmd:+.3f} R={right_cmd:+.3f}"
                     )
                     last_print = now
 
                 if drive is not None:
-                    drive.send(steering, speed)
+                    if at_entry:
+                        drive.stop()
+                    else:
+                        drive.send(steering, command_speed)
             elif drive is not None:
                 drive.stop()
 

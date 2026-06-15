@@ -147,4 +147,16 @@ q: 종료
 
 ## 7. 다음 구현 단계
 
-카메라, BEV, HSV, 슬롯 후보, 수동 주행이 모두 확인된 뒤 `main_parking_level1.py`를 추가해서 상태머신을 실제 카메라/제어 루프에 연결합니다.
+카메라, BEV, HSV, 슬롯 후보, 수동 주행이 모두 확인된 뒤 `main_parking_level1.py`를 사용해서 Level 1 루프를 검증합니다.
+
+먼저 dry-run:
+
+```bash
+python3 main_parking_level1.py
+```
+
+실제 저속 주행:
+
+```bash
+python3 main_parking_level1.py --drive --speed 0.18
+```
