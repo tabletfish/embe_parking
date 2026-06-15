@@ -35,6 +35,11 @@ vision:
   min_parking_width_px: 120
   max_parking_width_px: 420
   entry_offset_px: 120
+  boundary_scan_top_ratio: 0.05
+  boundary_scan_bottom_ratio: 0.78
+  min_boundary_column_fill: 0.18
+  min_boundary_width_px: 12
+  max_boundary_width_px: 180
 
 rover:
   serial_port: /dev/ttyUSB0
